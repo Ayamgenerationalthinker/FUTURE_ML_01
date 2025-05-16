@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sales Forecast ML</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <!-- Your CSS -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+
+  <style>
+    .refresh-btn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 4px;
+    }
+    .input-wrapper {
+      position: relative;
+    }
+    input {
+      padding-right: 30px; /* space for refresh icon */
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <div class="forecast-container">
+      <div class="forecast-header">
+        <div class="logo">
+          <div class="logo-icon"></div>
+        </div>
+        <h1>Sales Forecast</h1>
+        <p class="subtitle">Predict your third month sales with machine learning</p>
+      </div>
+
+      <div class="forecast-body">
+        <form class="forecast-form" action="{{ url_for('predict') }}" method="post" novalidate>
+          <div class="form-row rate-row">
+            <label for="rate">Growth Rate (%)</label>
+            <div class="input-wrapper with-refresh">
+              <input
+                id="rate"
+                type="text"
+                name="rate"
+                required
+                placeholder="e.g. 10"
+                pattern="^\d+(\.\d+)?$"
+                title="Please enter a valid number without % sign"
+                autocomplete="off"
+              />
+              <span class="input-focus"></span>
+              <button type="button" id="refresh-button" title="Clear all fields">🔄</button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="first-month">First Month Sales ($)</label>
+            <div class="input-wrapper">
+              <input
+                id="first-month"
+                type="text"
+                name="month1"
+                required
+                placeholder="e.g. 1000"
+                pattern="^\d+(\.\d+)?$"
+                title="Please enter a valid number without $ sign"
+                autocomplete="off"
+              />
+              <span class="input-focus"></span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="second-month">Second Month Sales ($)</label>
+            <div class="input-wrapper">
+              <input
+                id="second-month"
+                type="text"
+                name="month2"
+                required
+                placeholder="e.g. 1200"
+                pattern="^\d+(\.\d+)?$"
+                title="Please enter a valid number without $ sign"
+                autocomplete="off"
+              />
+              <span class="input-focus"></span>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="predict-button">
+              <span class="button-text">Generate Forecast</span>
+              <span class="button-icon">→</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Forecast Result Section -->
+        <div class="forecast-result">
+          <div class="result-header">
+            <span class="result-icon">📊</span>
+            <h3>Forecast Result</h3>
+          </div>
+          <div class="result-content">
+            <p>{{ prediction_text }}</p>
+            {% if plot_url %}
+              <img src="{{ plot_url }}" alt="Sales Forecast Plot" style="width:100%; margin-top: 20px;" />
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="forecast-footer">
+        <p>Powered by Prince Fiebor</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('refresh-button').addEventListener('click', () => {
+      document.getElementById('rate').value = '';
+      document.getElementById('first-month').value = '';
+      document.getElementById('second-month').value = '';
+
+      const resultText = document.querySelector('.result-content p');
+      if (resultText) resultText.innerText = '';
+
+      const resultImg = document.querySelector('.result-content img');
+      if (resultImg) resultImg.remove();
+    });
+  </script>
+</body>
+</html>
